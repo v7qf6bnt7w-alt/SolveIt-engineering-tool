@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SolveIt</title>
+    <script>
+        window.MathJax = { tex: { inlineMath: [["\\(", "\\)"], ["$", "$"]] } };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #050505;
+            --panel: #101010;
+            --panel-2: #171717;
+            --line: #333;
+            --text: #f7f7f7;
+            --muted: #b8b8b8;
+            --accent: #ffffff;
+            --danger: #ff6868;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+        .shell {
+            width: min(1180px, calc(100% - 28px));
+            margin: 0 auto;
+            padding: 24px 0 42px;
+        }
+        header {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 18px;
+            border-bottom: 1px solid var(--line);
+            padding-bottom: 18px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 34px;
+            letter-spacing: 0;
+        }
+        .subtitle {
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+        .tabs, .subtabs, .row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .mode-tabs { margin-top: 16px; }
+        .math-tabs { margin-top: 12px; }
+        .math-tabs[hidden], .physics-panel[hidden] { display: none; }
+        button, select, input, textarea {
+            border: 1px solid var(--line);
+            background: var(--panel-2);
+            color: var(--text);
+            border-radius: 8px;
+            font: inherit;
+        }
+        button {
+            min-height: 40px;
+            padding: 0 13px;
+            cursor: pointer;
+        }
+        button.active, button.primary {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+        }
+        main {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 390px;
+            gap: 18px;
+            margin-top: 18px;
+        }
+        .workspace, .results, .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+        .workspace { padding: 18px; }
+        .results {
+            padding: 18px;
+            min-height: 460px;
+        }
+        .panel { display: none; padding-top: 14px; border: 0; }
+        .panel.active { display: block; }
+        label {
+            display: grid;
+            gap: 7px;
+            color: var(--muted);
+            font-size: 13px;
+            margin: 13px 0;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 13px;
+            min-height: 44px;
+        }
+        textarea {
+            min-height: 88px;
+            resize: vertical;
+        }
+        .split {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+        .thirds {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+        .matrix-grid textarea { min-height: 132px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .keypad button {
+            min-width: 0;
+            padding: 0;
+            aspect-ratio: 1.45 / 1;
+        }
+        .complex-tools {
+            margin-top: 16px;
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel-2);
+        }
+        .symbol-pad {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .symbol-pad button {
+            min-height: 36px;
+            padding: 0 10px;
+        }
+        .result-block {
+            border-bottom: 1px solid var(--line);
+            padding: 12px 0;
+        }
+        .result-block:first-child { padding-top: 0; }
+        .result-title {
+            color: var(--muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 7px;
+        }
+        .latex {
+            overflow-x: auto;
+            padding-bottom: 2px;
+        }
+        .error { color: var(--danger); }
+        #graph {
+            height: 360px;
+            margin-top: 16px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+        .sketch-box {
+            margin-top: 16px;
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--panel-2);
+        }
+        #global-sketch-canvas {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            height: 180px;
+            background: #0b0b0b;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            cursor: crosshair;
+        }
+        @media (max-width: 900px) {
+            header, main { display: block; }
+            .tabs { margin-top: 18px; }
+            .results { margin-top: 18px; }
+            .split, .thirds { grid-template-columns: 1fr; }
+            .keypad { grid-template-columns: repeat(4, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <header>
+            <div>
+                <h1>SolveIt</h1>
+                <div class="subtitle">Advanced mathematics automation for mechanical engineering</div>
+            </div>
+            <nav class="tabs mode-tabs" aria-label="Main modes">
+                <button class="top-tab active" data-mode="calculator">1 Calculator</button>
+                <button class="top-tab" data-mode="mathematics">2 Mathematics</button>
+                <button class="top-tab" data-mode="physics">3 Physics</button>
+            </nav>
+        </header>
+
+        <main>
+            <section class="workspace">
+                <div class="sketch-box">
+                    <div class="subtitle">Sketch input</div>
+                    <canvas id="global-sketch-canvas" width="560" height="180"></canvas>
+                    <div class="row" style="margin-top: 10px;">
+                        <button id="global-sketch-clear" type="button">Clear</button>
+                        <button id="global-sketch-recognize" type="button">Recognize</button>
+                        <button id="global-sketch-solve" type="button">Use & solve</button>
+                    </div>
+                </div>
+
+                <section class="panel active" id="scientific">
+                    <div class="split">
+                        <label>Angle mode
+                            <select id="sci-angle">
+                                <option value="deg" selected>Degrees</option>
+                                <option value="rad">Radians</option>
+                                <option value="grad">Gradians</option>
+                            </select>
+                        </label>
+                        <label>Expression
+                            <input id="sci-expression" placeholder="\frac{3}{5}+sin(pi/6), sqrt(2), (2+3*I)^2">
+                        </label>
+                    </div>
+                    <div class="row">
+                        <button class="primary" data-action="scientific">Solve</button>
+                        <button data-clear="sci-expression">Clear</button>
+                    </div>
+                    <div class="keypad" data-target="sci-expression">
+                        <button>7</button><button>8</button><button>9</button><button>/</button><button>sin(</button><button>cos(</button>
+                        <button>4</button><button>5</button><button>6</button><button>*</button><button>tan(</button><button>sqrt(</button>
+                        <button>1</button><button>2</button><button>3</button><button>-</button><button>log(</button><button>ln(</button>
+                        <button>0</button><button>.</button><button>pi</button><button>+</button><button>^</button><button>)</button>
+                        <button>I</button><button>e</button><button>Abs(</button><button>exp(</button><button>(</button><button>,</button>
+                    </div>
+                </section>
+
+                <div class="tabs math-tabs" id="math-tabs" hidden aria-label="Mathematics modes">
+                    <button class="tab active" data-panel="algebra">1 Algebra</button>
+                    <button class="tab" data-panel="function">2 Functions</button>
+                    <button class="tab" data-panel="demonstrations">3 Demonstrations</button>
+                    <button class="tab" data-panel="limits">4 Limits</button>
+                    <button class="tab" data-panel="derivatives">5 Derivatives</button>
+                    <button class="tab" data-panel="integrals">6 Integrals</button>
+                    <button class="tab" data-panel="matrix">8 Matrix/LES</button>
+                </div>
+
+                <section class="panel" id="algebra">
+                    <div class="subtabs">
+                        <button class="subtab active" data-algebra="polynomial">Polynomial</button>
+                        <button class="subtab" data-algebra="unknown">Unknown coefficients</button>
+                        <button class="subtab" data-algebra="equation">Equation</button>
+                        <button class="subtab" data-algebra="inequality">Inequality</button>
+                    </div>
+                    <label>Variable
+                        <input id="alg-variable" value="x">
+                    </label>
+                    <div class="algebra-box" id="alg-polynomial">
+                        <label>Polynomial expression
+                            <input id="poly-expression" placeholder="x^3 - 6*x^2 + 11*x - 6">
+                        </label>
+                        <label>Or coefficients, greatest to smallest
+                            <input id="poly-coefficients" placeholder="1, -6, 11, -6">
+                        </label>
+                        <button class="primary" data-action="algebra-polynomial">Analyze polynomial</button>
+                    </div>
+                    <div class="algebra-box" id="alg-unknown" hidden>
+                        <label>Polynomial with unknown coefficients
+                            <input id="unknown-polynomial" value="(m-n)*x^3 + x^2 - 4*x + (m + 3*n)">
+                        </label>
+                        <div class="split">
+                            <label>Known roots
+                                <input id="unknown-roots" value="-1, 2">
+                            </label>
+                            <label>Unknowns
+                                <input id="unknown-symbols" value="m, n">
+                            </label>
+                        </div>
+                        <button class="primary" data-action="algebra-unknown">Find coefficients</button>
+                    </div>
+                    <div class="algebra-box" id="alg-equation" hidden>
+                        <label>Equation
+                            <input id="equation-expression" placeholder="x^2 - 5*x + 6 = 0">
+                        </label>
+                        <button class="primary" data-action="algebra-equation">Solve equation</button>
+                    </div>
+                    <div class="algebra-box" id="alg-inequality" hidden>
+                        <label>Inequality
+                            <input id="inequality-expression" placeholder="x^2 - 4 >= 0">
+                        </label>
+                        <button class="primary" data-action="algebra-inequality">Solve inequality</button>
+                    </div>
+                </section>
+
+                <section class="panel" id="function">
+                    <div class="thirds">
+                        <label>Function type
+                            <select id="fn-type">
+                                <option value="linear">Linear</option>
+                                <option value="quadratic">Quadratic</option>
+                                <option value="polynomial" selected>Polynomial</option>
+                                <option value="rational">Rational / homographic</option>
+                                <option value="exponential">Exponential</option>
+                                <option value="root">Even or odd root</option>
+                                <option value="logarithmic">Logarithmic</option>
+                            </select>
+                        </label>
+                        <label>Variable
+                            <input id="fn-variable" value="x">
+                        </label>
+                        <label>Function
+                            <input id="fn-expression" placeholder="(x^2 - 1)/(x - 2)">
+                        </label>
+                    </div>
+                    <button class="primary" data-action="function">Analyze function</button>
+                </section>
+
+                <section class="panel" id="limits">
+                    <label>Function
+                        <input id="limit-expression" placeholder="(x^2 - 1)/(x - 1)">
+                    </label>
+                    <div class="thirds">
+                        <label>Variable
+                            <input id="limit-variable" value="x">
+                        </label>
+                        <label>x goes to
+                            <input id="limit-target" value="1">
+                        </label>
+                        <label>Side
+                            <select id="limit-side">
+                                <option value="+-">Both</option>
+                                <option value="+">Right</option>
+                                <option value="-">Left</option>
+                            </select>
+                        </label>
+                    </div>
+                    <button class="primary" data-action="limit">Analyze limit</button>
+                </section>
+
+                <section class="panel" id="derivatives">
+                    <label>Mode
+                        <select id="der-mode">
+                            <option value="derivative">Derivatives</option>
+                            <option value="partial">Partial derivatives</option>
+                            <option value="differential">Differential approximation</option>
+                            <option value="analysis">Function analysis</option>
+                        </select>
+                    </label>
+                    <label>Function
+                        <input id="der-expression" placeholder="sin(x)*e^x + x^3">
+                    </label>
+                    <div class="split">
+                        <label>Differentiate with respect to
+                            <input id="der-variable" value="x">
+                        </label>
+                        <label id="der-order-wrap">Order
+                            <input id="der-order" type="number" value="1" min="1">
+                        </label>
+                    </div>
+                    <div class="split" id="der-diff-fields">
+                        <label>Initial x (x0)
+                            <input id="der-x0" value="0">
+                        </label>
+                        <label id="der-diff-input-label">Δx
+                            <input id="der-delta-x" value="0.1">
+                        </label>
+                    </div>
+                    <div class="split" id="der-diff-extra-fields">
+                        <label>Input type
+                            <select id="der-diff-input-type">
+                                <option value="delta_x">x and Δx</option>
+                                <option value="x1">x and x + Δx</option>
+                            </select>
+                        </label>
+                        <label id="der-x1-wrap">x + Δx (x1)
+                            <input id="der-x1" value="1">
+                        </label>
+                    </div>
+                    <div class="row">
+                        <button class="primary" data-action="derivative">Solve</button>
+                        <button id="derivative-again" type="button">d/dx</button>
+                    </div>
+                </section>
+
+                <section class="panel" id="integrals">
+                    <label>Integral type
+                        <select id="int-type">
+                            <option value="indefinite">Indefinite integral</option>
+                            <option value="definite">Definite integral</option>
+                            <option value="improper">Improper integral</option>
+                            <option value="trigonometric">Trigonometric integral</option>
+                            <option value="partial_fractions">Partial fractions</option>
+                            <option value="by_parts">Integration by parts</option>
+                            <option value="complex">Complex integral</option>
+                        </select>
+                    </label>
+                    <label>Function
+                        <input id="int-expression" placeholder="sin(x) + x^2 + exp(x)">
+                    </label>
+                    <div class="split">
+                        <label>Variable
+                            <input id="int-variable" value="x">
+                        </label>
+                        <label id="int-lower-wrap">Lower bound
+                            <input id="int-lower" value="0">
+                        </label>
+                    </div>
+                    <div class="split" id="int-upper-wrap">
+                        <label>Upper bound
+                            <input id="int-upper" value="1">
+                        </label>
+                        <label>Integration strategy
+                            <select id="int-strategy">
+                                <option value="general">General</option>
+                                <option value="manual">Manual simplification</option>
+                                <option value="complex">Complex-aware</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="symbol-pad">
+                        <button class="symbol-button" type="button" data-symbol="sin(">sin(</button>
+                        <button class="symbol-button" type="button" data-symbol="cos(">cos(</button>
+                        <button class="symbol-button" type="button" data-symbol="tan(">tan(</button>
+                        <button class="symbol-button" type="button" data-symbol="exp(">exp(</button>
+                        <button class="symbol-button" type="button" data-symbol="ln(">ln(</button>
+                        <button class="symbol-button" type="button" data-symbol="dx">dx</button>
+                        <button class="symbol-button" type="button" data-symbol="^">^</button>
+                        <button class="symbol-button" type="button" data-symbol="∞">∞</button>
+                        <button class="symbol-button" type="button" data-symbol="∫">∫</button>
+                    </div>
+                    <div class="row" style="margin-top: 12px;">
+                        <button class="primary" data-action="integral">Solve integral</button>
+                        <button data-clear="int-expression">Clear</button>
+                    </div>
+                </section>
+
+                <section class="panel" id="matrix">
+                    <label>Matrix / LES operation
+                        <select id="matrix-action">
+                            <option value="les">Solve linear equation system</option>
+                            <option value="add">A + B</option>
+                            <option value="subtract">A - B</option>
+                            <option value="multiply">A × B</option>
+                            <option value="scalar">Product by scalar</option>
+                            <option value="transpose">Transpose A</option>
+                            <option value="power">Power Aⁿ</option>
+                            <option value="special">Classify matrix</option>
+                            <option value="coefficient_solve">Solve unknown coefficients in AB = target</option>
+                        </select>
+                    </label>
+                    <div class="matrix-grid">
+                        <label>Matrix A
+                            <textarea id="matrix-a" placeholder="1, -1, 3\n0, 1, 2\n-4, 3, 1"></textarea>
+                            <span class="subtitle">One row per line; separate entries with commas or spaces.</span>
+                        </label>
+                        <label id="matrix-b-wrap">Matrix B
+                            <textarea id="matrix-b" placeholder="1, 2\nb, 4\n5, 6"></textarea>
+                        </label>
+                    </div>
+                    <div class="split" id="matrix-les-fields">
+                        <label>Independent terms (one per row)
+                            <textarea id="matrix-vector" placeholder="2\n0\n1/2"></textarea>
+                        </label>
+                        <div class="subtitle" style="padding-top: 13px;">Gaussian elimination records every row operation, then returns the reduced augmented matrix and solution.</div>
+                    </div>
+                    <div class="split" id="matrix-extra-fields">
+                        <label>Scalar / exponent
+                            <input id="matrix-scalar" value="2" placeholder="2 or n">
+                        </label>
+                        <label>Special matrix / unknowns
+                            <input id="matrix-special" value="square" placeholder="square, identity, diagonal or a,b">
+                        </label>
+                    </div>
+                    <label id="matrix-target-wrap">Target matrix (for AB = target)
+                        <textarea id="matrix-target" placeholder="1, 2, 3\n4, 5, 6\n7, 8, 9"></textarea>
+                    </label>
+                    <div class="row">
+                        <button class="primary" data-action="matrix">Solve matrix operation</button>
+                        <button data-clear="matrix-a">Clear A</button>
+                    </div>
+                </section>
+
+                <section class="panel physics-panel" id="physics" hidden>
+                    <div class="split">
+                        <label>Physics area
+                            <select id="physics-category">
+                                <option value="kinematics">1 Kinematics</option>
+                                <option value="dynamics">2 Dynamics</option>
+                                <option value="analysis">3 Motion analysis</option>
+                            </select>
+                        </label>
+                        <label>Calculation
+                            <select id="physics-mode"></select>
+                        </label>
+                    </div>
+                    <div class="thirds" id="physics-fields"></div>
+                    <button class="primary" data-action="physics">Calculate</button>
+                </section>
+
+                <div class="complex-tools math-only">
+                    <div class="subtitle">Complex helpers</div>
+                    <div class="symbol-pad">
+                        <button class="symbol-button" type="button" data-symbol="i">i</button>
+                        <button class="symbol-button" type="button" data-symbol="conj(">conj(</button>
+                        <button class="symbol-button" type="button" data-symbol="Re(">Re(</button>
+                        <button class="symbol-button" type="button" data-symbol="Im(">Im(</button>
+                        <button class="symbol-button" type="button" data-symbol="ℂ">ℂ</button>
+                        <button class="symbol-button" type="button" data-symbol="ℝ">ℝ</button>
+                        <button class="symbol-button" type="button" data-symbol="^">^</button>
+                    </div>
+                </div>
+                <div class="complex-tools math-only">
+                    <div class="subtitle">Complex solver</div>
+                    <label>Expression or equation
+                        <textarea id="complex-expression" placeholder="z = (3+4*i)/(1-i)"></textarea>
+                    </label>
+                    <div class="split">
+                        <label>Variable
+                            <input id="complex-variable" value="z">
+                        </label>
+                        <label>Mode
+                            <select id="complex-mode">
+                                <option value="expression">Expression</option>
+                                <option value="equation">Equation</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="row">
+                        <button class="primary" data-action="complex">Solve complex</button>
+                        <button data-clear="complex-expression">Clear</button>
+                    </div>
+                </div>
+
+                <section class="panel" id="demonstrations">
+                    <label>Method
+                        <select id="demo-method">
+                            <option value="direct">1 Direct</option>
+                            <option value="contrapositive">2 Contrapositive</option>
+                            <option value="absurd">3 Absurd</option>
+                            <option value="induction">4 Induction</option>
+                            <option value="proof">5 Proof</option>
+                        </select>
+                    </label>
+                    <label>Hypothesis
+                        <textarea id="demo-hyp" placeholder="x=2*k, k \in \mathbb{Z}"></textarea>
+                    </label>
+                    <label>Thesis
+                        <textarea id="demo-ths" placeholder="x^2=2*t, t \in \mathbb{Z}"></textarea>
+                    </label>
+                    <div class="symbol-pad">
+                        <button class="symbol-button" type="button" data-symbol="∀">∀</button>
+                        <button class="symbol-button" type="button" data-symbol="∑">∑</button>
+                        <button class="symbol-button" type="button" data-symbol="∃">∃</button>
+                        <button class="symbol-button" type="button" data-symbol="∈">∈</button>
+                        <button class="symbol-button" type="button" data-symbol="⊂">⊂</button>
+                        <button class="symbol-button" type="button" data-symbol="∞">∞</button>
+                        <button class="symbol-button" type="button" data-symbol="⇒">⇒</button>
+                        <button class="symbol-button" type="button" data-symbol="¬">¬</button>
+                        <button class="symbol-button" type="button" data-symbol="∧">∧</button>
+                        <button class="symbol-button" type="button" data-symbol="∨">∨</button>
+                        <button class="symbol-button" type="button" data-symbol="ℤ">ℤ</button>
+                        <button class="symbol-button" type="button" data-symbol="ℚ">ℚ</button>
+                        <button class="symbol-button" type="button" data-symbol="ℝ">ℝ</button>
+                        <button class="symbol-button" type="button" data-symbol="ℕ">ℕ</button>
+                        <button class="symbol-button" type="button" data-symbol="i">i</button>
+                        <button class="symbol-button" type="button" data-symbol="conj(">conj(</button>
+                        <button class="symbol-button" type="button" data-symbol="Re(">Re(</button>
+                        <button class="symbol-button" type="button" data-symbol="Im(">Im(</button>
+                        <button class="symbol-button" type="button" data-symbol="ℂ">ℂ</button>
+                    </div>
+                    <div class="row" style="margin-top: 14px;">
+                        <button class="primary" data-action="demonstration">Generate demonstration</button>
+                        <button data-clear="demo-hyp">Clear Hyp</button>
+                        <button data-clear="demo-ths">Clear Ths</button>
+                    </div>
+                    <div class="subtitle" style="margin-top: 10px;">Use the symbol buttons to build logical statements for proof templates.</div>
+                </section>
+            </section>
+
+            <aside class="results">
+                <div id="results">
+                    <div class="result-block">
+                        <div class="result-title">Ready</div>
+                        <div class="latex">\(SolveIt\)</div>
+                    </div>
+                </div>
+                <div id="graph"></div>
+            </aside>
+        </main>
+    </div>
+
+    <script>
+        const $ = (selector) => document.querySelector(selector);
+        const $$ = (selector) => [...document.querySelectorAll(selector)];
+        const resultBox = $("#results");
+        const graph = $("#graph");
+        let activeDemoInput = null;
+        let derivativeStepCount = 0;
+        const sketchCanvas = $("#global-sketch-canvas");
+        const sketchContext = sketchCanvas.getContext("2d");
+        let sketchStrokes = [];
+        let isSketching = false;
+        let activePanel = "scientific";
+        let activeMode = "calculator";
+
+        const physicsModes = {
+            kinematics: {
+                urm: ["x0", "v", "t"], uarm: ["x0", "v0", "a", "t"], projectile: ["v0", "angle", "t", "g"],
+                ucm: ["radius", "omega", "t"], uacm: ["radius", "omega0", "alpha", "t"]
+            },
+            dynamics: {
+                newton: ["mass", "acceleration"], weight: ["mass", "g"], normal: ["mass", "angle", "g"],
+                friction: ["coefficient", "normal"], tension: ["mass", "acceleration", "g"], inclined: ["mass", "angle", "g"],
+                spring: ["spring_constant", "displacement"], drag: ["drag_coefficient", "area", "velocity", "density"],
+                lift: ["lift_coefficient", "area", "velocity", "density"], centripetal: ["mass", "speed", "radius"]
+            },
+            analysis: {
+                position: ["expression", "variable"], displacement: ["expression", "variable", "x0", "x1"], velocity: ["expression", "variable"],
+                acceleration: ["expression", "variable"], derivatives: ["expression", "variable"], integrals: ["expression", "variable"],
+                limits: ["expression", "variable", "target"], vectors: ["components"], graphs: ["expression", "variable"]
+            }
+        };
+        const physicsLabels = { urm: "URM", uarm: "UARM", projectile: "Projectile motion", ucm: "UCM", uacm: "UACM", newton: "Newton's laws", weight: "Weight", normal: "Normal", friction: "Friction", tension: "Tension", inclined: "Inclined plane", spring: "Spring", drag: "Drag", lift: "Lift", centripetal: "Centripetal dynamics", position: "Position", displacement: "Displacement", velocity: "Velocity", acceleration: "Acceleration", derivatives: "Derivatives", integrals: "Integrals", limits: "Limits", vectors: "Vectors", graphs: "Graphs" };
+        const physicsDefaults = { g: "9.81", density: "1.225", variable: "x", expression: "x^2", t: "1", angle: "45", components: "3, 4" };
+
+        function updatePhysicsFields() {
+            const category = $("#physics-category").value;
+            const modeSelect = $("#physics-mode");
+            const current = modeSelect.value;
+            modeSelect.innerHTML = Object.keys(physicsModes[category]).map((mode) => `<option value="${mode}">${physicsLabels[mode]}</option>`).join("");
+            if (physicsModes[category][current]) modeSelect.value = current;
+            const fields = physicsModes[category][modeSelect.value];
+            $("#physics-fields").innerHTML = fields.map((name) => `<label>${name.replaceAll("_", " ")}<input data-physics-value="${name}" value="${physicsDefaults[name] || ""}" placeholder="${name}"></label>`).join("");
+        }
+
+        function showTopMode(mode) {
+            activeMode = mode;
+            $$(".top-tab").forEach((button) => button.classList.toggle("active", button.dataset.mode === mode));
+            $("#math-tabs").hidden = mode !== "mathematics";
+            $("#physics").hidden = mode !== "physics";
+            $$(".math-only").forEach((item) => item.hidden = mode !== "mathematics");
+            if (mode === "calculator") {
+                $$(".panel").forEach((panel) => panel.classList.toggle("active", panel.id === "scientific"));
+                activePanel = "scientific";
+            } else if (mode === "mathematics") {
+                const mathPanel = activePanel === "scientific" || activePanel === "physics" ? "algebra" : activePanel;
+                $$(".panel").forEach((panel) => panel.classList.toggle("active", panel.id === mathPanel));
+                activePanel = mathPanel;
+                $$(".tab").forEach((button) => button.classList.toggle("active", button.dataset.panel === mathPanel));
+            } else {
+                $$(".panel").forEach((panel) => panel.classList.toggle("active", panel.id === "physics"));
+                activePanel = "physics";
+            }
+        }
+
+        function derivativeStepLabel(stepNumber) {
+            return stepNumber <= 1 ? "d/dx" : `d(${stepNumber})`;
+        }
+
+        function updateDerivativeMode() {
+            const mode = $("#der-mode").value;
+            const orderWrap = $("#der-order-wrap");
+            const diffFields = $("#der-diff-fields");
+            const diffExtraFields = $("#der-diff-extra-fields");
+            const x1Wrap = $("#der-x1-wrap");
+            const diffInputLabel = $("#der-diff-input-label");
+
+            const isDerivativeLike = mode === "derivative" || mode === "partial";
+            orderWrap.hidden = !isDerivativeLike;
+            diffFields.hidden = isDerivativeLike || mode === "analysis";
+            diffExtraFields.hidden = isDerivativeLike || mode === "analysis";
+            const useFinalPoint = $("#der-diff-input-type").value === "x1";
+            x1Wrap.hidden = !useFinalPoint || mode !== "differential";
+            diffInputLabel.querySelector("input").placeholder = useFinalPoint ? "Δx will be computed automatically" : "Δx";
+            diffInputLabel.querySelector("input").value = useFinalPoint ? "" : $("#der-delta-x").value || "0.1";
+        }
+
+        function updateIntegralMode() {
+            const kind = $("#int-type").value;
+            const lowerWrap = $("#int-lower-wrap");
+            const upperWrap = $("#int-upper-wrap");
+            const needsBounds = kind === "definite" || kind === "improper";
+            lowerWrap.hidden = !needsBounds;
+            upperWrap.hidden = !needsBounds;
+        }
+
+        function updateMatrixMode() {
+            const action = $("#matrix-action").value;
+            $("#matrix-b-wrap").hidden = !["add", "subtract", "multiply", "coefficient_solve"].includes(action);
+            $("#matrix-les-fields").hidden = action !== "les";
+            $("#matrix-extra-fields").hidden = !["scalar", "power", "special", "coefficient_solve"].includes(action);
+            $("#matrix-target-wrap").hidden = action !== "coefficient_solve";
+            $("#matrix-scalar").parentElement.firstChild.textContent = action === "power" ? "Exponent" : "Scalar";
+            $("#matrix-special").parentElement.firstChild.textContent = action === "special" ? "Matrix property" : "Unknowns (comma-separated)";
+        }
+
+        function getSketchPoint(event) {
+            const rect = sketchCanvas.getBoundingClientRect();
+            const x = (event.clientX - rect.left) * (sketchCanvas.width / rect.width);
+            const y = (event.clientY - rect.top) * (sketchCanvas.height / rect.height);
+            return { x, y };
+        }
+
+        function drawSketchStroke(stroke) {
+            if (!stroke.length) return;
+            sketchContext.beginPath();
+            sketchContext.lineWidth = 3;
+            sketchContext.lineCap = "round";
+            sketchContext.lineJoin = "round";
+            sketchContext.strokeStyle = "#f7f7f7";
+            sketchContext.moveTo(stroke[0].x, stroke[0].y);
+            for (let i = 1; i < stroke.length; i++) {
+                sketchContext.lineTo(stroke[i].x, stroke[i].y);
+            }
+            sketchContext.stroke();
+        }
+
+        function clearSketchCanvas() {
+            sketchContext.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
+            sketchStrokes = [];
+        }
+
+        function strokeShape(stroke) {
+            const xs = stroke.map((point) => point.x);
+            const ys = stroke.map((point) => point.y);
+            const width = Math.max(...xs) - Math.min(...xs);
+            const height = Math.max(...ys) - Math.min(...ys);
+            const xStart = xs[0];
+            const xEnd = xs[xs.length - 1];
+            const yStart = ys[0];
+            const yEnd = ys[ys.length - 1];
+            const totalTurn = stroke.reduce((sum, point, index) => {
+                if (index === 0) return sum;
+                const prev = stroke[index - 1];
+                return sum + Math.abs(point.y - prev.y);
+            }, 0);
+            return { width, height, xStart, xEnd, yStart, yEnd, totalTurn };
+        }
+
+        function classifyStroke(stroke) {
+            const { width, height, xStart, xEnd, yStart, yEnd, totalTurn } = strokeShape(stroke);
+            const isWavy = width > 70 && height > 20 && totalTurn > 30;
+            const isDiagonal = width > 90 && height < 45;
+            const isVertical = width < 26 && height > 70;
+            const isParabola = xStart < xEnd && yStart > yEnd && width > 50 && height > 30;
+
+            if (isWavy) return "sin(x)";
+            if (isParabola) return "x^2";
+            if (isDiagonal || isVertical) return "x";
+            return "x";
+        }
+
+        function hasIntegralShape(strokes) {
+            if (strokes.length < 2) return false;
+            const tallStroke = strokes.find((stroke) => {
+                const { width, height } = strokeShape(stroke);
+                return width < 38 && height > 85;
+            });
+            if (!tallStroke) return false;
+            const otherStrokes = strokes.filter((stroke) => stroke !== tallStroke);
+            return otherStrokes.some((stroke) => {
+                const { width, height, xStart, xEnd } = strokeShape(stroke);
+                return width > 60 && height < 42 && xStart < xEnd;
+            });
+        }
+
+        function estimateSketchExpression() {
+            if (!sketchStrokes.length) return "";
+
+            const integralLike = hasIntegralShape(sketchStrokes);
+            if (integralLike) {
+                const nonIntegral = sketchStrokes.filter((stroke) => {
+                    const { width, height } = strokeShape(stroke);
+                    return !(width < 38 && height > 85);
+                });
+
+                if (nonIntegral.length) {
+                    const pieces = nonIntegral.map(classifyStroke).filter(Boolean);
+                    const expr = pieces.join(" + ");
+                    if (expr.includes("sin(x)")) {
+                        const result = expr.replace(/\s*\+\s*/g, " + ");
+                        return result;
+                    }
+                    return expr || "sin(x)";
+                }
+                return "sin(x)";
+            }
+
+            if (sketchStrokes.length === 1) return classifyStroke(sketchStrokes[0]);
+
+            const pieces = sketchStrokes.map(classifyStroke);
+            const combined = pieces.join(" + ");
+            if (combined.includes("sin(x)") && combined.includes("x^2")) return "sin(x) + x^2";
+            if (combined.includes("sin(x)") && combined.includes("x")) return "sin(x) + x";
+            if (combined.includes("x^2") && combined.includes("x")) return "x^2 + x";
+            if (combined.includes("sin(x)") && pieces.length > 1) return "sin(x) + x";
+            return combined.replace(/\s*\+\s*/g, " + ");
+        }
+
+        function getSketchTarget() {
+            const panel = activePanel;
+            if (panel === "scientific") return "sci-expression";
+            if (panel === "algebra") {
+                const activeSubtab = document.querySelector(".subtab.active");
+                const algebraName = activeSubtab && activeSubtab.dataset.algebra ? activeSubtab.dataset.algebra : "polynomial";
+                const map = {
+                    polynomial: "poly-expression",
+                    unknown: "unknown-polynomial",
+                    equation: "equation-expression",
+                    inequality: "inequality-expression",
+                };
+                return map[algebraName] || "poly-expression";
+            }
+            if (panel === "function") return "fn-expression";
+            if (panel === "limits") return "limit-expression";
+            if (panel === "derivatives") return "der-expression";
+            if (panel === "integrals") return "int-expression";
+            if (panel === "demonstrations") return activeDemoInput ? activeDemoInput.id : "demo-hyp";
+            return "sci-expression";
+        }
+
+        function getPanelSolveAction() {
+            const panel = activePanel;
+            if (panel === "scientific") return "scientific";
+            if (panel === "algebra") {
+                const activeSubtab = document.querySelector(".subtab.active");
+                const algebraName = activeSubtab && activeSubtab.dataset.algebra ? activeSubtab.dataset.algebra : "polynomial";
+                const map = {
+                    polynomial: "algebra-polynomial",
+                    unknown: "algebra-unknown",
+                    equation: "algebra-equation",
+                    inequality: "algebra-inequality",
+                };
+                return map[algebraName] || "algebra-polynomial";
+            }
+            if (panel === "function") return "function";
+            if (panel === "limits") return "limit";
+            if (panel === "derivatives") return "derivative";
+            if (panel === "integrals") return "integral";
+            return "scientific";
+        }
+
+        function applyRecognizedSketch(autoSolve = false) {
+            const recognized = estimateSketchExpression();
+            if (!recognized) {
+                resultBox.innerHTML = '<div class="result-block error">Draw a simple expression first, such as sin(x), x^2, x + 1, or sin(x) + x.</div>';
+                return;
+            }
+
+            const targetId = getSketchTarget();
+            const field = document.getElementById(targetId);
+            if (field) {
+                field.value = recognized;
+                field.focus();
+            }
+
+            if (activePanel === "integrals" && hasIntegralShape(sketchStrokes)) {
+                $("#int-type").value = "definite";
+                $("#int-lower").value = "0";
+                $("#int-upper").value = "pi";
+                updateIntegralMode();
+            }
+
+            if (autoSolve) {
+                const action = getPanelSolveAction();
+                const button = document.querySelector(`[data-action="${action}"]`);
+                if (button) {
+                    button.click();
+                }
+            }
+        }
+
+        sketchCanvas.addEventListener("pointerdown", (event) => {
+            isSketching = true;
+            const point = getSketchPoint(event);
+            sketchStrokes.push([point]);
+            sketchContext.beginPath();
+            sketchContext.moveTo(point.x, point.y);
+            sketchContext.lineTo(point.x, point.y);
+            sketchContext.strokeStyle = "#f7f7f7";
+            sketchContext.lineWidth = 3;
+            sketchContext.stroke();
+        });
+
+        sketchCanvas.addEventListener("pointermove", (event) => {
+            if (!isSketching) return;
+            const point = getSketchPoint(event);
+            const currentStroke = sketchStrokes[sketchStrokes.length - 1];
+            currentStroke.push(point);
+            sketchContext.lineTo(point.x, point.y);
+            sketchContext.stroke();
+        });
+
+        sketchCanvas.addEventListener("pointerup", () => { isSketching = false; });
+        sketchCanvas.addEventListener("pointerleave", () => { isSketching = false; });
+
+        $("#global-sketch-clear").addEventListener("click", clearSketchCanvas);
+        $("#global-sketch-recognize").addEventListener("click", () => {
+            const recognized = estimateSketchExpression();
+            if (!recognized) {
+                resultBox.innerHTML = '<div class="result-block error">Draw a simple expression first, such as sin(x), x^2, x + 1, or sin(x) + x.</div>';
+                return;
+            }
+            applyRecognizedSketch(false);
+            resultBox.innerHTML = `<div class="result-block"><div class="result-title">Sketch recognition</div><div class="latex">\\(\\text{Detected: } ${recognized}\\)</div></div>`;
+            MathJax.typesetPromise();
+        });
+        $("#global-sketch-solve").addEventListener("click", () => {
+            applyRecognizedSketch(true);
+        });
+
+        function latexBlock(title, value) {
+            return `<div class="result-block"><div class="result-title">${title}</div><div class="latex">\\(${value || "\\\\text{None}"}\\)</div></div>`;
+        }
+
+        function render(data) {
+            if (!data.success) {
+                resultBox.innerHTML = `<div class="result-block error">${data.error || "SolveIt error"}</div>`;
+                graph.innerHTML = "";
+                MathJax.typesetPromise();
+                return;
+            }
+            const skip = new Set(["success", "kind", "graph", "complex", "asymptotes", "side", "function_type", "display_title", "display_latex"]);
+            let html = "";
+            if (data.display_title && data.display_latex) {
+                html += latexBlock(data.display_title, data.display_latex);
+            }
+            Object.entries(data).forEach(([key, value]) => {
+                if (skip.has(key) || !key.endsWith("_latex")) return;
+                html += latexBlock(key.replaceAll("_", " "), value);
+            });
+            if (data.complex) {
+                Object.entries(data.complex).forEach(([key, value]) => html += latexBlock(`complex ${key.replaceAll("_", " ")}`, value));
+            }
+            if (data.asymptotes) {
+                Object.entries(data.asymptotes).forEach(([key, value]) => html += latexBlock(`asymptote ${key.replaceAll("_", " ")}`, value));
+            }
+            if (data.numeric) {
+                html += `<div class="result-block"><div class="result-title">numeric</div><div>${data.numeric}</div></div>`;
+            }
+            resultBox.innerHTML = html || latexBlock("result", "\\text{Done}");
+            if (data.graph) {
+                Plotly.newPlot(graph, [{ x: data.graph.x, y: data.graph.y, mode: "lines", line: { color: "#fff", width: 2 } }], {
+                    paper_bgcolor: "#101010",
+                    plot_bgcolor: "#101010",
+                    font: { color: "#f7f7f7" },
+                    margin: { l: 42, r: 14, t: 18, b: 38 },
+                    xaxis: { gridcolor: "#333", zerolinecolor: "#777" },
+                    yaxis: { gridcolor: "#333", zerolinecolor: "#777" }
+                }, { displayModeBar: false, responsive: true });
+            } else {
+                graph.innerHTML = "";
+            }
+            MathJax.typesetPromise();
+        }
+
+        async function post(url, payload) {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            render(await response.json());
+        }
+
+        $$(".top-tab").forEach((button) => button.addEventListener("click", () => showTopMode(button.dataset.mode)));
+        $("#physics-category").addEventListener("change", updatePhysicsFields);
+        $("#physics-mode").addEventListener("change", updatePhysicsFields);
+
+        $$(".tab").forEach((button) => {
+            button.addEventListener("click", () => {
+            showTopMode("mathematics");
+                $$(".tab").forEach((item) => item.classList.toggle("active", item === button));
+                $$(".panel").forEach((panel) => panel.classList.toggle("active", panel.id === button.dataset.panel));
+                activePanel = button.dataset.panel;
+            });
+        });
+
+        $$(".subtab").forEach((button) => {
+            button.addEventListener("click", () => {
+                $$(".subtab").forEach((item) => item.classList.toggle("active", item === button));
+                $$(".algebra-box").forEach((box) => box.hidden = box.id !== `alg-${button.dataset.algebra}`);
+                activePanel = "algebra";
+            });
+        });
+
+        $$(".keypad button").forEach((button) => {
+            button.addEventListener("click", () => {
+                const input = document.getElementById(button.closest(".keypad").dataset.target);
+                input.value += button.textContent;
+                input.focus();
+            });
+        });
+
+        $$("[data-clear]").forEach((button) => button.addEventListener("click", () => {
+            document.getElementById(button.dataset.clear).value = "";
+        }));
+
+        $("#der-mode").addEventListener("change", updateDerivativeMode);
+        $("#der-diff-input-type").addEventListener("change", updateDerivativeMode);
+        $("#int-type").addEventListener("change", updateIntegralMode);
+        $("#matrix-action").addEventListener("change", updateMatrixMode);
+        $("#derivative-again").addEventListener("click", async () => {
+            const currentExpression = ($("#der-expression").value || "").trim();
+            if (!currentExpression) {
+                resultBox.innerHTML = `<div class="result-block error">Enter a function before differentiating again.</div>`;
+                return;
+            }
+
+            try {
+                const response = await fetch("/api/derivative", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        expression: currentExpression,
+                        variable: $("#der-variable").value,
+                        order: 1
+                    })
+                });
+                const data = await response.json();
+                if (!data.success) {
+                    render(data);
+                    return;
+                }
+
+                derivativeStepCount += 1;
+                const nextExpression = data.plain_expression || data.derivative_text || data.simplified_text || currentExpression;
+                render({
+                    ...data,
+                    display_title: derivativeStepLabel(derivativeStepCount),
+                    display_latex: data.derivative_latex,
+                });
+                $("#der-expression").value = nextExpression;
+                $("#der-order").value = 1;
+            } catch (error) {
+                resultBox.innerHTML = `<div class="result-block error">Derivative step failed.</div>`;
+            }
+        });
+        $$("input, textarea").forEach((field) => {
+            field.addEventListener("focus", () => { activeDemoInput = field; });
+        });
+        $$(".symbol-button").forEach((button) => {
+            button.addEventListener("click", () => {
+                if (!activeDemoInput) {
+                    activeDemoInput = $("#demo-hyp");
+                }
+                activeDemoInput.value += button.dataset.symbol;
+                activeDemoInput.focus();
+            });
+        });
+        updatePhysicsFields();
+        updateDerivativeMode();
+        updateIntegralMode();
+        updateMatrixMode();
+        showTopMode("calculator");
+
+        $$("[data-action]").forEach((button) => {
+            button.addEventListener("click", () => {
+                const action = button.dataset.action;
+                if (action === "scientific") {
+                    post("/api/scientific", { expression: $("#sci-expression").value, angle_mode: $("#sci-angle").value });
+                }
+                if (action === "algebra-polynomial") {
+                    post("/api/algebra", {
+                        action: "polynomial_roots",
+                        variable: $("#alg-variable").value,
+                        polynomial: $("#poly-expression").value,
+                        coefficients: $("#poly-coefficients").value
+                    });
+                }
+                if (action === "algebra-unknown") {
+                    post("/api/algebra", {
+                        action: "unknown_coefficients",
+                        variable: $("#alg-variable").value,
+                        polynomial: $("#unknown-polynomial").value,
+                        roots: $("#unknown-roots").value,
+                        unknowns: $("#unknown-symbols").value
+                    });
+                }
+                if (action === "algebra-equation") {
+                    post("/api/algebra", { action: "equation", variable: $("#alg-variable").value, equation: $("#equation-expression").value });
+                }
+                if (action === "algebra-inequality") {
+                    post("/api/algebra", { action: "inequality", variable: $("#alg-variable").value, inequality: $("#inequality-expression").value });
+                }
+                if (action === "function") {
+                    post("/api/function", { expression: $("#fn-expression").value, function_type: $("#fn-type").value, variable: $("#fn-variable").value });
+                }
+                if (action === "limit") {
+                    post("/api/limit", { expression: $("#limit-expression").value, variable: $("#limit-variable").value, target: $("#limit-target").value, side: $("#limit-side").value });
+                }
+                if (action === "complex") {
+                    post("/api/complex", {
+                        expression: $("#complex-expression").value,
+                        variable: $("#complex-variable").value,
+                        equation_mode: $("#complex-mode").value === "equation"
+                    });
+                }
+                if (action === "demonstration") {
+                    post("/api/demonstration", {
+                        method: $("#demo-method").value,
+                        hypothesis: $("#demo-hyp").value,
+                        thesis: $("#demo-ths").value
+                    });
+                }
+                if (action === "derivative") {
+                    const mode = $("#der-mode").value;
+                    derivativeStepCount = 0;
+                    if (mode === "differential") {
+                        post("/api/derivative", {
+                            mode: "differential",
+                            expression: $("#der-expression").value,
+                            variable: $("#der-variable").value,
+                            x0: $("#der-x0").value,
+                            delta_x: $("#der-delta-x").value,
+                            x1: $("#der-x1").value,
+                            input_type: $("#der-diff-input-type").value
+                        });
+                    } else if (mode === "analysis") {
+                        post("/api/derivative", {
+                            mode: "analysis",
+                            expression: $("#der-expression").value,
+                            variable: $("#der-variable").value
+                        });
+                    } else {
+                        post("/api/derivative", {
+                            mode: mode === "partial" ? "partial" : "derivative",
+                            expression: $("#der-expression").value,
+                            variable: $("#der-variable").value,
+                            order: $("#der-order").value
+                        });
+                    }
+                }
+                if (action === "integral") {
+                    post("/api/integral", {
+                        expression: $("#int-expression").value,
+                        variable: $("#int-variable").value,
+                        kind: $("#int-type").value,
+                        lower: $("#int-lower").value,
+                        upper: $("#int-upper").value,
+                        strategy: $("#int-strategy").value
+                    });
+                }
+                if (action === "matrix") {
+                    const matrixAction = $("#matrix-action").value;
+                    post("/api/matrix", {
+                        action: matrixAction,
+                        matrix_a: $("#matrix-a").value,
+                        matrix_b: $("#matrix-b").value,
+                        vector: $("#matrix-vector").value,
+                        scalar: $("#matrix-scalar").value,
+                        exponent: $("#matrix-scalar").value,
+                        special: $("#matrix-special").value,
+                        target: $("#matrix-target").value,
+                        unknowns: $("#matrix-special").value
+                    });
+                }
+                if (action === "physics") {
+                    const values = {};
+                    $$("[data-physics-value]").forEach((field) => { values[field.dataset.physicsValue] = field.value; });
+                    post("/api/physics", { category: $("#physics-category").value, mode: $("#physics-mode").value, values });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
