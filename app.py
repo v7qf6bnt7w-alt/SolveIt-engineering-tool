@@ -927,11 +927,20 @@ def analyze_complex_expression(expression: str, variable_name: str = "z", equati
 
     expr = parse_math(expr_text, local_symbols)
     value = sp.simplify(expr.subs(variable, z_value))
+    real_part = sp.simplify(sp.re(value))
+    imaginary_part = sp.simplify(sp.im(value))
+    magnitude = sp.simplify(sp.Abs(value))
+    argument = sp.simplify(sp.arg(value))
+    argument_pi = sp.simplify(argument / sp.pi)
     return {
         "kind": "complex",
         "complex_expression_latex": latex(expr_text),
-        "real_part_latex": latex(sp.simplify(sp.re(value))),
-        "imaginary_part_latex": latex(sp.simplify(sp.im(value))),
+        "real_part_latex": latex(real_part),
+        "imaginary_part_latex": latex(imaginary_part),
+        "magnitude_latex": latex(magnitude),
+        "argument_latex": latex(argument),
+        "argument_pi_latex": latex(argument_pi),
+        "polar_latex": latex(magnitude * sp.exp(sp.I * argument)),
         "decomposition_latex": latex(sp.Eq(sp.Symbol(variable_name or "z"), a + b * sp.I)),
     }
 
@@ -1022,7 +1031,7 @@ def build_demonstration(method: str, hypothesis: str, thesis: str) -> dict[str, 
 
 @app.route("/")
 def index():
-    return send_from_directory(BASE_DIR, "solveit.html")
+    return send_from_directory(BASE_DIR, "solveit_restyle.html")
 
 
 @app.route("/solveit.html")
@@ -1030,11 +1039,16 @@ def solveit_html():
     return send_from_directory(BASE_DIR, "solveit.html")
 
 
+@app.route("/solveit_restyle.html")
+def solveit_restyle_html():
+    return send_from_directory(BASE_DIR, "solveit_restyle.html")
+
+
 @app.route("/api/scientific", methods=["POST"])
 def api_scientific():
     payload = request.get_json(silent=True) or {}
     try:
-        return response_ok(**scientific_calculate(payload.get("expression", ""), payload.get("angle_mode", "deg")))
+        return response_ok(**scientific_calculate(payload.get("expression", ""), payload.get("angle_mode", "rad")))
     except Exception as exc:
         return response_error("Scientific calculator error", exc)
 

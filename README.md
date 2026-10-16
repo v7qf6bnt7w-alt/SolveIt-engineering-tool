@@ -27,6 +27,12 @@ SolveIt is being developed around several areas, including:
 * Physics calculations
 * Automated mathematical manipulation
 
+The default interface is the redesigned [`solveit_restyle.html`](./solveit_restyle.html).
+The original interface remains available at [`solveit.html`](./solveit.html). The
+redesigned Mathematics mode includes **9 Complex**, with radian-oriented input
+and readable Cartesian/polar output: real part, imaginary part, magnitude,
+argument θ, and θ as a multiple of π.
+
 The application uses **SymPy** as its mathematical engine, allowing it to work with symbolic expressions rather than relying exclusively on numerical approximations.
 
 ## Engineering Philosophy
