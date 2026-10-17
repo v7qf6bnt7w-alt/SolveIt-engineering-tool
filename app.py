@@ -341,8 +341,9 @@ def scientific_calculate(expression: str, angle_mode: str) -> dict[str, Any]:
     parsed = parse_math(degree_trig_text(expression) if angle_mode == "deg" else expression)
     result = sp.simplify(parsed)
     numeric = sp.N(result, 14)
-    return {
+    data = {
         "kind": "scientific",
+        "angle_mode": angle_mode,
         "input_latex": latex(parse_math(expression)),
         "result": text(result),
         "result_latex": latex(result),
@@ -356,6 +357,13 @@ def scientific_calculate(expression: str, angle_mode: str) -> dict[str, Any]:
             "conjugate_latex": latex(sp.conjugate(result)),
         },
     }
+    if angle_mode == "rad":
+        data["result_pi_multiple_latex"] = latex(sp.simplify(result / sp.pi))
+        data["numeric_pi_multiple_latex"] = latex(sp.N(result / sp.pi, 14))
+    real_symbols = [symbol for symbol in result.free_symbols if symbol.is_real]
+    if len(real_symbols) == 1:
+        data["graph"] = graph_points(result, real_symbols[0])
+    return data
 
 
 def physics_calculate(category: str, mode: str, values: dict[str, Any]) -> dict[str, Any]:
@@ -565,6 +573,8 @@ def analyze_derivative_features(expression: str, variable_name: str) -> dict[str
         "kind": "derivative_analysis",
         "expression_latex": latex(expr),
         "derivative_latex": latex(derivative),
+        "x_intercepts_latex": latex(sp.solve(sp.Eq(expr, 0), variable)),
+        "y_intercept_latex": latex(sp.simplify(expr.subs(variable, 0))),
         "second_derivative_latex": latex(second_derivative),
         "critical_points_latex": format_points(critical_points),
         "maxima_latex": format_points(maxima_points),
@@ -942,6 +952,13 @@ def analyze_complex_expression(expression: str, variable_name: str = "z", equati
         "argument_pi_latex": latex(argument_pi),
         "polar_latex": latex(magnitude * sp.exp(sp.I * argument)),
         "decomposition_latex": latex(sp.Eq(sp.Symbol(variable_name or "z"), a + b * sp.I)),
+        "complex_point": {
+            "real": float(sp.N(real_part)),
+            "imaginary": float(sp.N(imaginary_part)),
+            "magnitude": float(sp.N(magnitude)),
+            "argument": float(sp.N(argument)),
+            "argument_pi": float(sp.N(argument_pi)),
+        } if real_part.is_number and imaginary_part.is_number else None,
     }
 
 
