@@ -1044,6 +1044,11 @@ def solveit_restyle_html():
     return send_from_directory(BASE_DIR, "solveit_restyle.html")
 
 
+@app.route("/solveit_restyle2.html")
+def solveit_restyle2_html():
+    return send_from_directory(BASE_DIR, "solveit_restyle2.html")
+
+
 @app.route("/api/scientific", methods=["POST"])
 def api_scientific():
     payload = request.get_json(silent=True) or {}
