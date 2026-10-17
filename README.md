@@ -27,9 +27,8 @@ SolveIt is being developed around several areas, including:
 * Physics calculations
 * Automated mathematical manipulation
 
-The default interface is the redesigned [`solveit_restyle.html`](./solveit_restyle.html).
-The experimental command-center interface is available at
-[`solveit_restyle2.html`](./solveit_restyle2.html), and can also be served from
+The application frontend is [`solveit_restyle2.html`](./solveit_restyle2.html).
+It is served at the root URL (`/`) and is also available directly at
 `/solveit_restyle2.html` when running Flask. It includes a responsive calculation
 workspace, local recent-work history, specialized derivative/integral launchers,
 and a persisted light/dark theme switch. The interface also includes persisted
@@ -41,8 +40,7 @@ matrix/LES operations, complex analysis, and demonstrations, using the
 existing symbolic API routes. Its tool names, descriptions, field labels,
 operation choices, and common result metadata are localized consistently across
 all seven supported languages.
-The original interface remains available at [`solveit.html`](./solveit.html). The
-redesigned Mathematics mode includes **9 Complex**, with radian-oriented input
+The Mathematics mode includes **9 Complex**, with radian-oriented input
 and readable Cartesian/polar output: real part, imaginary part, magnitude,
 argument θ, and θ as a multiple of π.
 
