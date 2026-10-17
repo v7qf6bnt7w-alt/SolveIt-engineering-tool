@@ -1031,17 +1031,7 @@ def build_demonstration(method: str, hypothesis: str, thesis: str) -> dict[str, 
 
 @app.route("/")
 def index():
-    return send_from_directory(BASE_DIR, "solveit_restyle.html")
-
-
-@app.route("/solveit.html")
-def solveit_html():
-    return send_from_directory(BASE_DIR, "solveit.html")
-
-
-@app.route("/solveit_restyle.html")
-def solveit_restyle_html():
-    return send_from_directory(BASE_DIR, "solveit_restyle.html")
+    return send_from_directory(BASE_DIR, "solveit_restyle2.html")
 
 
 @app.route("/solveit_restyle2.html")
