@@ -77,6 +77,226 @@ SAFE_FUNCTIONS = {
     "tanh": sp.tanh,
 }
 
+PERIODIC_TABLE: dict[str, dict[str, Any]] = {
+    "H": {"name": "Hydrogen", "atomic_number": 1, "mass": 1.008, "polarity": "nonpolar atom", "electronegativity": 2.20, "electron_affinity_kj_mol": 72.8, "group": 1, "period": 1, "state": "gas"},
+    "He": {"name": "Helium", "atomic_number": 2, "mass": 4.003, "polarity": "nonpolar atom", "electronegativity": None, "electron_affinity_kj_mol": 0, "group": 18, "period": 1, "state": "gas"},
+    "Li": {"name": "Lithium", "atomic_number": 3, "mass": 6.94, "polarity": "nonpolar atom", "electronegativity": 0.98, "electron_affinity_kj_mol": 59.6, "group": 1, "period": 2, "state": "solid"},
+    "C": {"name": "Carbon", "atomic_number": 6, "mass": 12.011, "polarity": "nonpolar atom", "electronegativity": 2.55, "electron_affinity_kj_mol": 121.8, "group": 14, "period": 2, "state": "solid"},
+    "N": {"name": "Nitrogen", "atomic_number": 7, "mass": 14.007, "polarity": "nonpolar atom", "electronegativity": 3.04, "electron_affinity_kj_mol": -6.8, "group": 15, "period": 2, "state": "gas"},
+    "O": {"name": "Oxygen", "atomic_number": 8, "mass": 15.999, "polarity": "nonpolar atom", "electronegativity": 3.44, "electron_affinity_kj_mol": 141.0, "group": 16, "period": 2, "state": "gas"},
+    "F": {"name": "Fluorine", "atomic_number": 9, "mass": 18.998, "polarity": "nonpolar atom", "electronegativity": 3.98, "electron_affinity_kj_mol": 328.2, "group": 17, "period": 2, "state": "gas"},
+    "Ne": {"name": "Neon", "atomic_number": 10, "mass": 20.180, "polarity": "nonpolar atom", "electronegativity": None, "electron_affinity_kj_mol": 0, "group": 18, "period": 2, "state": "gas"},
+    "Na": {"name": "Sodium", "atomic_number": 11, "mass": 22.990, "polarity": "nonpolar atom", "electronegativity": 0.93, "electron_affinity_kj_mol": 52.8, "group": 1, "period": 3, "state": "solid"},
+    "Mg": {"name": "Magnesium", "atomic_number": 12, "mass": 24.305, "polarity": "nonpolar atom", "electronegativity": 1.31, "electron_affinity_kj_mol": 0, "group": 2, "period": 3, "state": "solid"},
+    "Al": {"name": "Aluminium", "atomic_number": 13, "mass": 26.982, "polarity": "nonpolar atom", "electronegativity": 1.61, "electron_affinity_kj_mol": 42.5, "group": 13, "period": 3, "state": "solid"},
+    "Si": {"name": "Silicon", "atomic_number": 14, "mass": 28.085, "polarity": "nonpolar atom", "electronegativity": 1.90, "electron_affinity_kj_mol": 134.1, "group": 14, "period": 3, "state": "solid"},
+    "P": {"name": "Phosphorus", "atomic_number": 15, "mass": 30.974, "polarity": "nonpolar atom", "electronegativity": 2.19, "electron_affinity_kj_mol": 72.0, "group": 15, "period": 3, "state": "solid"},
+    "S": {"name": "Sulfur", "atomic_number": 16, "mass": 32.06, "polarity": "nonpolar atom", "electronegativity": 2.58, "electron_affinity_kj_mol": 200.4, "group": 16, "period": 3, "state": "solid"},
+    "Cl": {"name": "Chlorine", "atomic_number": 17, "mass": 35.45, "polarity": "nonpolar atom", "electronegativity": 3.16, "electron_affinity_kj_mol": 349.0, "group": 17, "period": 3, "state": "gas"},
+    "Ar": {"name": "Argon", "atomic_number": 18, "mass": 39.948, "polarity": "nonpolar atom", "electronegativity": None, "electron_affinity_kj_mol": 0, "group": 18, "period": 3, "state": "gas"},
+    "K": {"name": "Potassium", "atomic_number": 19, "mass": 39.098, "polarity": "nonpolar atom", "electronegativity": 0.82, "electron_affinity_kj_mol": 48.4, "group": 1, "period": 4, "state": "solid"},
+    "Ca": {"name": "Calcium", "atomic_number": 20, "mass": 40.078, "polarity": "nonpolar atom", "electronegativity": 1.00, "electron_affinity_kj_mol": 2.4, "group": 2, "period": 4, "state": "solid"},
+    "Fe": {"name": "Iron", "atomic_number": 26, "mass": 55.845, "polarity": "nonpolar atom", "electronegativity": 1.83, "electron_affinity_kj_mol": 15.7, "group": 8, "period": 4, "state": "solid"},
+    "Cu": {"name": "Copper", "atomic_number": 29, "mass": 63.546, "polarity": "nonpolar atom", "electronegativity": 1.90, "electron_affinity_kj_mol": 119.2, "group": 11, "period": 4, "state": "solid"},
+    "Zn": {"name": "Zinc", "atomic_number": 30, "mass": 65.38, "polarity": "nonpolar atom", "electronegativity": 1.65, "electron_affinity_kj_mol": 0, "group": 12, "period": 4, "state": "solid"},
+    "Br": {"name": "Bromine", "atomic_number": 35, "mass": 79.904, "polarity": "nonpolar atom", "electronegativity": 2.96, "electron_affinity_kj_mol": 324.6, "group": 17, "period": 4, "state": "liquid"},
+    "Ag": {"name": "Silver", "atomic_number": 47, "mass": 107.868, "polarity": "nonpolar atom", "electronegativity": 1.93, "electron_affinity_kj_mol": 125.6, "group": 11, "period": 5, "state": "solid"},
+    "I": {"name": "Iodine", "atomic_number": 53, "mass": 126.904, "polarity": "nonpolar atom", "electronegativity": 2.66, "electron_affinity_kj_mol": 295.3, "group": 17, "period": 5, "state": "solid"},
+    "Au": {"name": "Gold", "atomic_number": 79, "mass": 196.967, "polarity": "nonpolar atom", "electronegativity": 2.54, "electron_affinity_kj_mol": 222.8, "group": 11, "period": 6, "state": "solid"},
+}
+ELEMENT_NAMES = {data["name"].lower(): symbol for symbol, data in PERIODIC_TABLE.items()}
+
+
+def number(value: Any, name: str) -> float:
+    try:
+        result = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{name} must be numeric") from exc
+    if not math.isfinite(result):
+        raise ValueError(f"{name} must be finite")
+    return result
+
+
+def chemistry_element(query: str) -> dict[str, Any]:
+    key = str(query or "").strip()
+    symbol = next((candidate for candidate in PERIODIC_TABLE if candidate.lower() == key.lower()), None)
+    symbol = symbol or ELEMENT_NAMES.get(key.lower())
+    if not symbol:
+        raise ValueError("Unknown element; use a symbol or supported element name")
+    return {"kind": "periodic", "symbol": symbol, **PERIODIC_TABLE[symbol]}
+
+
+def chemistry_gas(action: str, values: dict[str, Any]) -> dict[str, Any]:
+    if action == "moles":
+        mass, molar_mass = number(values.get("mass"), "mass"), number(values.get("molar_mass"), "molar_mass")
+        if molar_mass <= 0: raise ValueError("molar_mass must be positive")
+        return {"kind": "gas", "action": action, "moles": mass / molar_mass, "formula": "n = m / M"}
+    if action == "mass":
+        moles, molar_mass = number(values.get("moles"), "moles"), number(values.get("molar_mass"), "molar_mass")
+        return {"kind": "gas", "action": action, "mass": moles * molar_mass, "formula": "m = n M"}
+    if action == "ideal":
+        R = number(values.get("R", 0.082057), "R")
+        known = {key: number(values.get(key), key) for key in ("P", "V", "n", "T") if values.get(key) not in (None, "")}
+        if len(known) != 3: raise ValueError("Ideal gas law needs exactly three known values")
+        missing = next(key for key in ("P", "V", "n", "T") if key not in known)
+        formulas = {
+            "P": lambda: known["n"] * R * known["T"] / known["V"],
+            "V": lambda: known["n"] * R * known["T"] / known["P"],
+            "n": lambda: known["P"] * known["V"] / (R * known["T"]),
+            "T": lambda: known["P"] * known["V"] / (known["n"] * R),
+        }
+        solved = formulas[missing]()
+        return {"kind": "gas", "action": action, "missing": missing, "value": solved, "formula": "PV = nRT", "R": R}
+    if action == "combined":
+        known = {key: number(values.get(key), key) for key in ("P1", "V1", "T1", "P2", "V2", "T2") if values.get(key) not in (None, "")}
+        if len(known) != 5: raise ValueError("Combined gas law needs five known values")
+        missing = next(key for key in ("P1", "V1", "T1", "P2", "V2", "T2") if key not in known)
+        left, right = known.get("P1", 1) * known.get("V1", 1) / known.get("T1", 1), known.get("P2", 1) * known.get("V2", 1) / known.get("T2", 1)
+        formulas = {
+            "P1": lambda: right * known["T1"] / known["V1"],
+            "V1": lambda: right * known["T1"] / known["P1"],
+            "T1": lambda: known["P1"] * known["V1"] / right,
+            "P2": lambda: left * known["T2"] / known["V2"],
+            "V2": lambda: left * known["T2"] / known["P2"],
+            "T2": lambda: known["P2"] * known["V2"] / left,
+        }
+        solved = formulas[missing]()
+        constant = "Boyle" if known.get("T1") == known.get("T2") else "Charles" if known.get("P1") == known.get("P2") else "Gay-Lussac" if known.get("V1") == known.get("V2") else "combined"
+        return {"kind": "gas", "action": action, "missing": missing, "value": solved, "law": constant, "formula": "P1V1/T1 = P2V2/T2"}
+    raise ValueError("Unknown gas calculation")
+
+
+def parse_formula(formula: str) -> dict[str, int]:
+    tokens = re.findall(r"([A-Z][a-z]?|\d+|\(|\))", formula.replace(" ", ""))
+    if "".join(tokens) != formula.replace(" ", ""): raise ValueError(f"Invalid formula: {formula}")
+    stack: list[dict[str, int]] = [{}]
+    i = 0
+    while i < len(tokens):
+        token = tokens[i]
+        if token == "(":
+            stack.append({})
+        elif token == ")":
+            if len(stack) == 1: raise ValueError("Unmatched parenthesis")
+            group = stack.pop(); multiplier = int(tokens[i + 1]) if i + 1 < len(tokens) and tokens[i + 1].isdigit() else 1
+            if multiplier != 1: i += 1
+            for element, count in group.items(): stack[-1][element] = stack[-1].get(element, 0) + count * multiplier
+        elif token.isdigit():
+            raise ValueError("Formula multiplier must follow an element or group")
+        else:
+            multiplier = int(tokens[i + 1]) if i + 1 < len(tokens) and tokens[i + 1].isdigit() else 1
+            if multiplier != 1: i += 1
+            stack[-1][token] = stack[-1].get(token, 0) + multiplier
+        i += 1
+    if len(stack) != 1: raise ValueError("Unmatched parenthesis")
+    return stack[0]
+
+
+def balance_equation(equation: str) -> dict[str, Any]:
+    sides = re.split(r"\s*(?:->|=>|=)\s*", equation.strip())
+    if len(sides) != 2: raise ValueError("Use reactants -> products")
+    reactants, products = [part.strip() for part in sides[0].split("+")], [part.strip() for part in sides[1].split("+")]
+    formulas = reactants + products
+    compositions = [parse_formula(re.sub(r"^\d+", "", formula)) for formula in formulas]
+    elements = sorted({element for composition in compositions for element in composition})
+    matrix = sp.Matrix([[composition.get(element, 0) * (1 if index < len(reactants) else -1) for index, composition in enumerate(compositions)] for element in elements])
+    basis = matrix.nullspace()
+    if not basis: raise ValueError("Equation cannot be balanced")
+    vector = basis[0]; denominator = sp.ilcm(*[term.q for term in vector]); coefficients = [int(term * denominator) for term in vector]
+    common = math.gcd(*[abs(coefficient) for coefficient in coefficients]); coefficients = [coefficient // common for coefficient in coefficients]
+    if any(coefficient < 0 for coefficient in coefficients): coefficients = [-coefficient for coefficient in coefficients]
+    def format_side(items, offset=0):
+        return " + ".join((("" if coefficients[offset + i] == 1 else str(coefficients[offset + i])) + re.sub(r"^\d+", "", item)) for i, item in enumerate(items))
+    return {"kind": "stoichiometry", "coefficients": coefficients, "balanced": format_side(reactants) + " -> " + format_side(products, len(reactants)), "elements": elements}
+
+
+def chemistry_stoichiometry(action: str, values: dict[str, Any]) -> dict[str, Any]:
+    if action == "limiting":
+        coefficients = [number(item, "coefficient") for item in split_csv(str(values.get("coefficients", "")))]
+        amounts = [number(item, "moles") for item in split_csv(str(values.get("moles", "")))]
+        if not coefficients or len(coefficients) != len(amounts) or any(item <= 0 for item in coefficients):
+            raise ValueError("Provide matching positive coefficient and mole lists")
+        ratios = [amount / coefficient for amount, coefficient in zip(amounts, coefficients)]
+        limiting = min(range(len(ratios)), key=ratios.__getitem__)
+        return {"kind": "stoichiometry", "action": action, "ratios": ratios, "limiting_index": limiting, "limiting_moles": amounts[limiting], "extent": ratios[limiting], "formula": "limiting reactant = min(nᵢ / νᵢ)"}
+    if action == "theoretical_yield":
+        reactant_moles = number(values.get("reactant_moles"), "reactant_moles")
+        reactant_coefficient = number(values.get("reactant_coefficient"), "reactant_coefficient")
+        product_coefficient = number(values.get("product_coefficient"), "product_coefficient")
+        product_moles = reactant_moles * product_coefficient / reactant_coefficient
+        result: dict[str, Any] = {"kind": "stoichiometry", "action": action, "product_moles": product_moles, "formula": "n(product) = n(reactant) × ν(product) / ν(reactant)"}
+        if values.get("product_molar_mass") not in (None, ""):
+            result["product_mass"] = product_moles * number(values["product_molar_mass"], "product_molar_mass")
+        return result
+    raise ValueError("Unknown stoichiometry calculation")
+
+
+def chemistry_solution(action: str, values: dict[str, Any]) -> dict[str, Any]:
+    if action == "n_m":
+        mass, molar_mass = number(values.get("mass"), "mass"), number(values.get("molar_mass"), "molar_mass")
+        return {"kind": "solution", "action": action, "value": mass / molar_mass, "formula": "n = m / M"}
+    if action in {"m_m", "m_v", "v_v", "molarity", "molality", "ppm", "mole_fraction", "purity", "yield"}:
+        a = number(values.get("a"), "a"); b = number(values.get("b"), "b")
+        formulas = {"m_m": a / b * 100, "m_v": a / b * 100, "v_v": a / b * 100, "molarity": a / b * 1000, "molality": a / b * 1000, "ppm": a / b * 1_000_000, "mole_fraction": a / b, "purity": a / b * 100, "yield": a / b * 100}
+        labels = {"m_m": "%m/m", "m_v": "%m/v", "v_v": "%v/v", "molarity": "M", "molality": "m", "ppm": "ppm", "mole_fraction": "Xst", "purity": "purity", "yield": "yield"}
+        return {"kind": "solution", "action": action, "label": labels[action], "value": formulas[action]}
+    raise ValueError("Unknown solution calculation")
+
+
+def chemistry_kinetics(action: str, values: dict[str, Any]) -> dict[str, Any]:
+    if action == "rate":
+        change, time = number(values.get("change"), "change"), number(values.get("time"), "time")
+        return {"kind": "kinetics", "action": action, "value": change / time, "formula": "v = Δ[A] / Δt"}
+    if action == "rate_law":
+        k, a, b, x, y = [number(values.get(key), key) for key in ("k", "A", "B", "x", "y")]
+        return {"kind": "kinetics", "action": action, "value": k * a**x * b**y, "formula": "v = k[A]^x[B]^y"}
+    if action in {"half_life", "decay"}:
+        lam, initial, time = number(values.get("lambda"), "lambda"), number(values.get("initial"), "initial"), number(values.get("time", 0), "time")
+        if action == "half_life": return {"kind": "kinetics", "action": action, "value": math.log(2) / lam, "formula": "t1/2 = ln(2) / λ"}
+        return {"kind": "kinetics", "action": action, "value": initial * math.exp(-lam * time), "periods": lam * time / math.log(2), "formula": "N = N0 e^(-λt)"}
+    if action == "integrated":
+        order = int(number(values.get("order"), "order"))
+        concentration, initial, k, time = [number(values.get(key), key) for key in ("concentration", "initial", "k", "time")]
+        if order == 0:
+            result = initial - k * time
+            formula = "[A] = [A]₀ - kt"
+        elif order == 1:
+            result = initial * math.exp(-k * time)
+            formula = "ln[A] = ln[A]₀ - kt"
+        elif order == 2:
+            result = 1 / (1 / initial + k * time)
+            formula = "1/[A] = 1/[A]₀ + kt"
+        else:
+            raise ValueError("Integrated rate order must be 0, 1, or 2")
+        return {"kind": "kinetics", "action": action, "value": result, "formula": formula, "input_concentration": concentration}
+    if action == "order":
+        rate_ratio, concentration_ratio = number(values.get("rate_ratio"), "rate_ratio"), number(values.get("concentration_ratio"), "concentration_ratio")
+        if rate_ratio <= 0 or concentration_ratio <= 0 or concentration_ratio == 1:
+            raise ValueError("Ratios must be positive and concentration ratio cannot equal 1")
+        return {"kind": "kinetics", "action": action, "value": math.log(rate_ratio) / math.log(concentration_ratio), "formula": "order = ln(v₂/v₁) / ln([A]₂/[A]₁)"}
+    raise ValueError("Unknown kinetics calculation")
+
+
+def chemistry_equilibrium(action: str, values: dict[str, Any]) -> dict[str, Any]:
+    if action == "quotient":
+        products, reactants = number(values.get("products"), "products"), number(values.get("reactants"), "reactants")
+        return {"kind": "equilibrium", "action": action, "value": products / reactants, "formula": "Qc = products / reactants"}
+    if action in {"kc", "kp"}:
+        products, reactants = number(values.get("products"), "products"), number(values.get("reactants"), "reactants")
+        return {"kind": "equilibrium", "action": action, "value": products / reactants, "formula": f"K{action[1]} = products / reactants"}
+    if action == "ice":
+        initial, change, coefficient = number(values.get("initial"), "initial"), number(values.get("change"), "change"), number(values.get("coefficient", 1), "coefficient")
+        equilibrium = initial + coefficient * change
+        if values.get("K") not in (None, ""):
+            k_value = number(values["K"], "K")
+            x = sp.symbols("x", real=True)
+            roots = sp.solve(sp.Eq((initial + coefficient * x) ** 2, k_value), x)
+            valid = [root for root in roots if root.is_real and root >= 0]
+            if valid:
+                change = float(valid[0])
+                equilibrium = initial + coefficient * change
+        return {"kind": "equilibrium", "action": action, "equilibrium": equilibrium, "change": change, "formula": "[eq] = [initial] + coefficient·x"}
+    raise ValueError("Unknown equilibrium calculation")
+
 
 def response_ok(**payload: Any):
     logger.info("Solved request: %s", payload.get("kind", "unknown"))
@@ -1046,14 +1266,79 @@ def build_demonstration(method: str, hypothesis: str, thesis: str) -> dict[str, 
     }
 
 
+UNIT_CATALOG: dict[str, dict[str, dict[str, float]]] = {
+    "length": {
+        "m": {"factor": 1}, "mm": {"factor": 1e-3}, "cm": {"factor": 1e-2},
+        "km": {"factor": 1e3}, "in": {"factor": 0.0254}, "ft": {"factor": 0.3048},
+        "yd": {"factor": 0.9144}, "mi": {"factor": 1609.344}, "nmi": {"factor": 1852},
+    },
+    "mass": {
+        "kg": {"factor": 1}, "mg": {"factor": 1e-6}, "g": {"factor": 1e-3},
+        "t": {"factor": 1e3}, "oz": {"factor": 0.028349523125}, "lb": {"factor": 0.45359237},
+        "stone": {"factor": 6.35029318},
+    },
+    "time": {
+        "s": {"factor": 1}, "ms": {"factor": 1e-3}, "min": {"factor": 60},
+        "h": {"factor": 3600}, "day": {"factor": 86400}, "week": {"factor": 604800},
+    },
+    "area": {
+        "m²": {"factor": 1}, "mm²": {"factor": 1e-6}, "cm²": {"factor": 1e-4},
+        "km²": {"factor": 1e6}, "in²": {"factor": 0.00064516}, "ft²": {"factor": 0.09290304},
+        "acre": {"factor": 4046.8564224}, "ha": {"factor": 10000},
+    },
+    "volume": {
+        "m³": {"factor": 1}, "cm³": {"factor": 1e-6}, "L": {"factor": 1e-3},
+        "mL": {"factor": 1e-6}, "ft³": {"factor": 0.028316846592}, "in³": {"factor": 1.6387064e-5},
+        "US gal": {"factor": 0.003785411784}, "qt": {"factor": 0.000946352946},
+    },
+    "speed": {
+        "m/s": {"factor": 1}, "km/h": {"factor": 1 / 3.6}, "mph": {"factor": 0.44704},
+        "ft/s": {"factor": 0.3048}, "knot": {"factor": 0.514444444444},
+    },
+    "acceleration": {"m/s²": {"factor": 1}, "ft/s²": {"factor": 0.3048}, "Gal": {"factor": 0.01}},
+    "force": {"N": {"factor": 1}, "kN": {"factor": 1e3}, "dyn": {"factor": 1e-5}, "lbf": {"factor": 4.4482216152605}, "kgf": {"factor": 9.80665}},
+    "pressure": {"Pa": {"factor": 1}, "kPa": {"factor": 1e3}, "MPa": {"factor": 1e6}, "bar": {"factor": 1e5}, "atm": {"factor": 101325}, "mmHg": {"factor": 133.322387415}, "psi": {"factor": 6894.757293168}},
+    "energy": {"J": {"factor": 1}, "kJ": {"factor": 1e3}, "MJ": {"factor": 1e6}, "Wh": {"factor": 3600}, "kWh": {"factor": 3.6e6}, "cal": {"factor": 4.184}, "kcal": {"factor": 4184}, "BTU": {"factor": 1055.05585262}},
+    "power": {"W": {"factor": 1}, "kW": {"factor": 1e3}, "MW": {"factor": 1e6}, "hp": {"factor": 745.699871582}},
+    "frequency": {"Hz": {"factor": 1}, "kHz": {"factor": 1e3}, "MHz": {"factor": 1e6}, "GHz": {"factor": 1e9}},
+    "angle": {"rad": {"factor": 1}, "deg": {"factor": math.pi / 180}, "grad": {"factor": math.pi / 200}, "turn": {"factor": 2 * math.pi}},
+    "charge": {"C": {"factor": 1}, "mC": {"factor": 1e-3}, "μC": {"factor": 1e-6}, "Ah": {"factor": 3600}, "mAh": {"factor": 3.6}},
+    "voltage": {"V": {"factor": 1}, "mV": {"factor": 1e-3}, "kV": {"factor": 1e3}},
+    "resistance": {"Ω": {"factor": 1}, "mΩ": {"factor": 1e-3}, "kΩ": {"factor": 1e3}, "MΩ": {"factor": 1e6}},
+    "temperature": {"K": {"factor": 1, "offset": 0}, "°C": {"factor": 1, "offset": 273.15}, "°F": {"factor": 5 / 9, "offset": 255.372222222}},
+    "data": {"bit": {"factor": 1}, "byte": {"factor": 8}, "kB": {"factor": 8000}, "MB": {"factor": 8e6}, "GB": {"factor": 8e9}, "KiB": {"factor": 8192}, "MiB": {"factor": 8388608}},
+}
+
+
+def convert_units(value: Any, from_unit: str, to_unit: str, category: str) -> dict[str, Any]:
+    if category not in UNIT_CATALOG:
+        raise ValueError("Unknown unit category")
+    units = UNIT_CATALOG[category]
+    if from_unit not in units or to_unit not in units:
+        raise ValueError("Both units must belong to the selected category")
+    numeric = number(value, "value")
+    source, target = units[from_unit], units[to_unit]
+    base_value = numeric * source["factor"] + source.get("offset", 0)
+    converted = (base_value - target.get("offset", 0)) / target["factor"]
+    return {
+        "kind": "units",
+        "category": category,
+        "value": numeric,
+        "from_unit": from_unit,
+        "to_unit": to_unit,
+        "result": converted,
+        "formula": f"{numeric:g} {from_unit} = {converted:g} {to_unit}",
+    }
+
+
 @app.route("/")
 def index():
-    return send_from_directory(BASE_DIR, "solveit_restyle2.html")
+    return send_from_directory(BASE_DIR, "solveit_newfrontend.html")
 
 
-@app.route("/solveit_restyle2.html")
-def solveit_restyle2_html():
-    return send_from_directory(BASE_DIR, "solveit_restyle2.html")
+@app.route("/solveit_newfrontend.html")
+def solveit_newfrontend_html():
+    return send_from_directory(BASE_DIR, "solveit_newfrontend.html")
 
 
 @app.route("/api/scientific", methods=["POST"])
@@ -1236,6 +1521,46 @@ def api_demonstration():
         ))
     except Exception as exc:
         return response_error("Demonstration generation error", exc)
+
+
+@app.route("/api/chemistry", methods=["POST"])
+def api_chemistry():
+    payload = request.get_json(silent=True) or {}
+    action = str(payload.get("action", "")).strip()
+    try:
+        if action == "periodic":
+            return response_ok(**chemistry_element(payload.get("element", "")))
+        if action.startswith("gas_"):
+            return response_ok(**chemistry_gas(action[4:], payload.get("values", {})))
+        if action.startswith("solution_"):
+            return response_ok(**chemistry_solution(action[9:], payload.get("values", {})))
+        if action.startswith("stoich_"):
+            return response_ok(**chemistry_stoichiometry(action[7:], payload.get("values", {})))
+        if action.startswith("kinetics_"):
+            return response_ok(**chemistry_kinetics(action[9:], payload.get("values", {})))
+        if action.startswith("equilibrium_"):
+            return response_ok(**chemistry_equilibrium(action[12:], payload.get("values", {})))
+        if action == "balance":
+            return response_ok(**balance_equation(payload.get("equation", "")))
+        raise ValueError("Unknown chemistry action")
+    except Exception as exc:
+        return response_error("Chemistry calculation error", exc)
+
+
+@app.route("/api/units", methods=["GET", "POST"])
+def api_units():
+    if request.method == "GET":
+        return response_ok(kind="units_catalog", categories=UNIT_CATALOG)
+    payload = request.get_json(silent=True) or {}
+    try:
+        return response_ok(**convert_units(
+            payload.get("value"),
+            payload.get("from_unit", ""),
+            payload.get("to_unit", ""),
+            payload.get("category", ""),
+        ))
+    except Exception as exc:
+        return response_error("Unit conversion error", exc)
 
 
 if __name__ == "__main__":

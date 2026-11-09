@@ -27,22 +27,19 @@ SolveIt is being developed around several areas, including:
 * Physics calculations
 * Automated mathematical manipulation
 
-The application frontend is [`solveit_restyle2.html`](./solveit_restyle2.html).
-It is served at the root URL (`/`) and is also available directly at
-`/solveit_restyle2.html` when running Flask. It includes a responsive calculation
-workspace, local recent-work history, specialized derivative/integral launchers,
-and a persisted light/dark theme switch. The interface also includes persisted
-localization for English (UK/US), Argentine Spanish, German, Portuguese
-(Brazil/Portugal), Italian, French, and Russian.
-The Mathematics Studio in this interface exposes the full nested toolset:
-algebra operations, function-type analysis, limits, derivatives, integrals,
-matrix/LES operations, complex analysis, and demonstrations, using the
-existing symbolic API routes. Its tool names, descriptions, field labels,
-operation choices, and common result metadata are localized consistently across
-all seven supported languages.
-The Mathematics mode includes **9 Complex**, with radian-oriented input
-and readable Cartesian/polar output: real part, imaginary part, magnitude,
-argument θ, and θ as a multiple of π.
+The default application frontend is [`solveit_newfrontend.html`](./solveit_newfrontend.html).
+It is served at the root URL (`/`) and presents six responsive sections:
+Calculator, Calculus, Algebra, Physics Lab, Chemistry Lab, and Units Converter.
+The Chemistry Lab adds periodic-element lookup, gas laws and the rule of three,
+solution nomenclature (`st`/`sc`), equation balancing, limiting reactants,
+theoretical yield, kinetics, radioactive decay, and equilibrium calculations.
+These operations are exposed through the JSON `POST /api/chemistry` route.
+
+The Units Converter is available as a sixth frontend mode. It provides two-way
+editable input/output displays and converts across length, mass, time, area,
+volume, speed, acceleration, force, pressure, energy, power, frequency, angle,
+charge, voltage, resistance, temperature, and digital-data units through
+`GET /api/units` and `POST /api/units`.
 
 The application uses **SymPy** as its mathematical engine, allowing it to work with symbolic expressions rather than relying exclusively on numerical approximations.
 
