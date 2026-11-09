@@ -41,6 +41,10 @@ volume, speed, acceleration, force, pressure, energy, power, frequency, angle,
 charge, voltage, resistance, temperature, and digital-data units through
 `GET /api/units` and `POST /api/units`.
 
+The scientific calculator defaults to degrees while retaining selectable
+radians and gradians. Chemistry element results include common oxidation states,
+and symbolic results render every returned LaTeX field in the frontend.
+
 The application uses **SymPy** as its mathematical engine, allowing it to work with symbolic expressions rather than relying exclusively on numerical approximations.
 
 ## Engineering Philosophy

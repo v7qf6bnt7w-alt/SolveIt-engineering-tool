@@ -123,7 +123,17 @@ def chemistry_element(query: str) -> dict[str, Any]:
     symbol = symbol or ELEMENT_NAMES.get(key.lower())
     if not symbol:
         raise ValueError("Unknown element; use a symbol or supported element name")
-    return {"kind": "periodic", "symbol": symbol, **PERIODIC_TABLE[symbol]}
+    data = dict(PERIODIC_TABLE[symbol])
+    common_states = {
+        "H": [-1, 1], "C": [-4, 2, 4], "N": [-3, 1, 2, 3, 4, 5],
+        "O": [-2, -1, 1, 2], "F": [-1], "Na": [1], "Mg": [2],
+        "Al": [3], "Si": [-4, 2, 4], "P": [-3, 3, 5], "S": [-2, 2, 4, 6],
+        "Cl": [-1, 1, 3, 5, 7], "K": [1], "Ca": [2], "Fe": [2, 3],
+        "Cu": [1, 2], "Zn": [2], "Br": [-1, 1, 3, 5], "Ag": [1],
+        "I": [-1, 1, 3, 5, 7], "Au": [1, 3],
+    }
+    data["oxidation_states"] = common_states.get(symbol, [])
+    return {"kind": "periodic", "symbol": symbol, **data}
 
 
 def chemistry_gas(action: str, values: dict[str, Any]) -> dict[str, Any]:
@@ -555,7 +565,7 @@ def degree_trig_text(expression: str) -> str:
     return text_expr
 
 
-def scientific_calculate(expression: str, angle_mode: str) -> dict[str, Any]:
+def scientific_calculate(expression: str, angle_mode: str = "deg") -> dict[str, Any]:
     if angle_mode == "grad":
         expression = re.sub(r"\b(sin|cos|tan)\(", r"\1(pi/200*", latex_to_sympy_text(expression))
     parsed = parse_math(degree_trig_text(expression) if angle_mode == "deg" else expression)
@@ -1345,7 +1355,7 @@ def solveit_newfrontend_html():
 def api_scientific():
     payload = request.get_json(silent=True) or {}
     try:
-        return response_ok(**scientific_calculate(payload.get("expression", ""), payload.get("angle_mode", "rad")))
+        return response_ok(**scientific_calculate(payload.get("expression", ""), payload.get("angle_mode", "deg")))
     except Exception as exc:
         return response_error("Scientific calculator error", exc)
 
